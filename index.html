@@ -72,6 +72,8 @@
   .node.selected{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-bg);}
   .node.related{border-color:var(--blue);}
   .node.dimmed{opacity:0.35;}
+  .node.spmi{border-color:var(--coral);background:var(--coral-bg);}
+  .node.spmi.selected{border-color:var(--teal);background:var(--surface);}
 
   .hint{
     text-align:center;color:var(--hint);font-size:12.5px;margin-top:10px;
@@ -114,7 +116,7 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>Peta Sistem Informasi Kampus</h1>
+    <h1>Peta sistem informasi kampus</h1>
     <p class="lede">Klik salah satu sistem untuk melihat detail sub-sistem dan hubungannya dengan kategori lain.</p>
   </header>
 
@@ -123,7 +125,7 @@
       <svg class="rel-lines" id="lines" viewBox="0 0 100 82" preserveAspectRatio="none"></svg>
       <div class="hub">
         <div class="t">Sistem informasi kampus</div>
-        <div class="s">10 kategori kebutuhan</div>
+        <div class="s">11 kategori kebutuhan</div>
       </div>
       <!-- nodes injected by JS -->
     </div>
@@ -137,8 +139,8 @@
 const categories = {
   sdm: {
     name:"SDM", subtitle:"Pegawai & kinerja dosen",
-    items:["Database Pegawai","Sistem Penilaian dan Pelaporan Kinerja Dosen"],
-    related:["financial","akademik","riset"]
+    items:["Database Pegawai","Sistem Penilaian dan Pelaporan Kinerja Pegawai (Dosen, Tendik, Tenaga Kontrak)"],
+    related:["financial","akademik","riset","spmi","administrasi"]
   },
   kerjasama: {
     name:"Kerjasama mitra", subtitle:"Perusahaan, industri, SMA",
@@ -148,12 +150,12 @@ const categories = {
   riset: {
     name:"Riset & abdimas", subtitle:"Penelitian & publikasi",
     items:["Sistem Penelitian dan Pengabdian Masyarakat","Database Publikasi"],
-    related:["sdm","financial","kerjasama"]
+    related:["sdm","financial","kerjasama","spmi"]
   },
   akademik: {
     name:"Akademik", subtitle:"8 sistem akademik & MBKM",
     items:["Sistem Informasi Orang Tua","Sistem Informasi Akademik (SIAKAD)","Rekognisi Pembelajaran Lampau","Outcome Based Education System and Evaluation","Sistem Merdeka Belajar Kampus Merdeka (MBKM)","Ijazah dan Transkrip","Sistem Informasi Akademik khusus Kedokteran (Sistem Blok)","Microcredentials (short course)"],
-    related:["sdm","financial","pmb","kemahasiswaan","lulusan"]
+    related:["sdm","financial","pmb","kemahasiswaan","lulusan","spmi","administrasi"]
   },
   pmb: {
     name:"Penerimaan mahasiswa", subtitle:"Sistem PMB",
@@ -161,19 +163,19 @@ const categories = {
     related:["akademik","financial"]
   },
   financial: {
-    name:"Financial", subtitle:"5 sistem keuangan & payroll",
-    items:["Revenue Generating Unit","Payroll","Program Pengajuan Anggaran dan LPJ","Keuangan Mahasiswa","Pencatatan Hibah Penelitian dan Abdimas"],
-    related:["sdm","akademik","riset","pmb","aset"]
+    name:"Financial", subtitle:"6 sistem keuangan & payroll",
+    items:["Revenue Generating Unit","Payroll","Program Pengajuan Anggaran dan LPJ","Keuangan Mahasiswa","Pencatatan Hibah Penelitian dan Abdimas","Keuangan Ormawa"],
+    related:["sdm","akademik","riset","pmb","aset","kemahasiswaan","administrasi"]
   },
   administrasi: {
     name:"Administrasi", subtitle:"E-office & arsip digital",
     items:["E-Office","Arsip Digital"],
-    related:["aset"]
+    related:["aset","sdm","akademik","financial"]
   },
   kemahasiswaan: {
-    name:"Kemahasiswaan", subtitle:"Poin, beasiswa & prestasi",
-    items:["Poin Kegiatan Kemahasiswaan","Beasiswa","Catatan Prestasi Mahasiswa"],
-    related:["akademik","lulusan"]
+    name:"Kemahasiswaan", subtitle:"5 sistem kemahasiswaan & ormawa",
+    items:["Poin Kegiatan Kemahasiswaan","Beasiswa","Catatan Prestasi Mahasiswa","Kegiatan Kemahasiswaan","Monev Ormawa"],
+    related:["akademik","lulusan","spmi","financial"]
   },
   lulusan: {
     name:"Output lulusan", subtitle:"Tracer study & karir alumni",
@@ -184,10 +186,15 @@ const categories = {
     name:"Aset universitas", subtitle:"Pengelolaan aset kampus",
     items:["Pengelolaan Aset Universitas"],
     related:["financial","administrasi"]
+  },
+  spmi: {
+    name:"SPMI", subtitle:"Penjaminan mutu internal",
+    items:["Sistem Penjaminan Mutu Internal (SPMI)"],
+    related:["akademik","sdm","riset","kemahasiswaan"]
   }
 };
 
-const order = ["sdm","kerjasama","riset","akademik","pmb","financial","administrasi","kemahasiswaan","lulusan","aset"];
+const order = ["sdm","kerjasama","riset","akademik","pmb","financial","administrasi","kemahasiswaan","lulusan","aset","spmi"];
 const cx = 50, cy = 41, R = 33;
 const positions = {};
 
@@ -210,7 +217,7 @@ order.forEach(key=>{
   const cat = categories[key];
   const pos = positions[key];
   const el = document.createElement('div');
-  el.className = 'node';
+  el.className = 'node'+(key==='spmi' ? ' spmi' : '');
   el.id = 'node-'+key;
   el.style.left = pos.x+'%';
   el.style.top = pos.y+'%';
@@ -224,6 +231,7 @@ document.getElementById('node-pmb').style.transform = 'translate(-50%, -50%) tra
 document.getElementById('node-akademik').style.transform = 'translate(-50%, -50%) translate(65px,80px)';
 document.getElementById('node-riset').style.transform = 'translate(-50%, -50%) translateY(80px)';
 document.getElementById('node-kemahasiswaan').style.transform = 'translate(-50%, -50%) translate(-70px, 80px)';
+document.getElementById('node-administrasi').style.transform = 'translate(-50%, -50%) translateY(150px)';
 
 // draw all connector lines (hidden by default), one entry per unique pair
 const drawn = new Set();
@@ -248,7 +256,7 @@ order.forEach(key=>{
   const x2=+line.getAttribute('x2'), y2=+line.getAttribute('y2');
   line.setAttribute('x1', x1 + (x2-x1)*amount);
   line.setAttribute('y1', y1 + (y2-y1)*amount);
-})('administrasi__aset', 0.20);
+})('administrasi__aset', 0.001);
 
 function selectCategory(key){
   selected = key;
