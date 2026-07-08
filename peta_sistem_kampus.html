@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peta Sistem Informasi Kampus</title>
+<style>
+  :root{
+    --bg:#F5F7FA;
+    --surface:#FFFFFF;
+    --ink:#182233;
+    --muted:#5B6478;
+    --hint:#8B93A3;
+    --border:#E1E5EC;
+    --teal:#0F6E56;
+    --teal-bg:#E1F5EE;
+    --blue:#185FA5;
+    --blue-bg:#E6F1FB;
+    --coral:#993C1D;
+    --coral-bg:#FAECE7;
+    --dim:#C7CCD6;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding:32px 20px 60px;
+  }
+  .wrap{max-width:920px;margin:0 auto;}
+  header{margin-bottom:28px;}
+  h1{font-size:22px;font-weight:600;margin:0 0 6px;letter-spacing:-0.01em;}
+  p.lede{color:var(--muted);font-size:14px;margin:0;line-height:1.6;max-width:640px;}
+
+  .diagram-scroll{overflow-x:auto;padding-bottom:8px;}
+  .diagram{
+    position:relative;
+    width:100%;
+    min-width:640px;
+    aspect-ratio:1/0.82;
+    margin:0 auto;
+  }
+  svg.rel-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+  svg.rel-lines line{stroke:var(--dim);stroke-width:0.35;transition:stroke .2s, stroke-width .2s, opacity .2s;}
+  svg.rel-lines line.active{stroke:var(--teal);stroke-width:0.6;}
+
+  .hub{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:150px;text-align:center;
+    background:var(--surface);border:1px solid var(--border);border-radius:12px;
+    padding:12px 10px;box-shadow:0 1px 2px rgba(20,30,50,0.06);
+  }
+  .hub .t{font-size:13px;font-weight:600;line-height:1.3;}
+  .hub .s{font-size:11px;color:var(--muted);margin-top:2px;}
+
+  .node{
+    position:absolute;transform:translate(-50%,-50%);
+    width:126px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:9px 10px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .2s, box-shadow .2s, opacity .2s, transform .15s;
+  }
+  .node:hover{transform:translate(-50%,-50%) translateY(-2px);box-shadow:0 4px 10px rgba(20,30,50,0.08);}
+  .node .t{font-size:12.5px;font-weight:600;line-height:1.3;}
+  .node .s{font-size:10.5px;color:var(--muted);margin-top:2px;}
+  .node.selected{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-bg);}
+  .node.related{border-color:var(--blue);}
+  .node.dimmed{opacity:0.35;}
+
+  .hint{
+    text-align:center;color:var(--hint);font-size:12.5px;margin-top:10px;
+  }
+
+  .panel{
+    margin-top:28px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:24px 26px;
+    min-height:80px;
+  }
+  .panel.empty{color:var(--hint);font-size:13.5px;display:flex;align-items:center;justify-content:center;padding:36px;}
+  .panel-header{display:flex;align-items:baseline;gap:10px;margin-bottom:4px;flex-wrap:wrap;}
+  .panel-header h2{font-size:18px;font-weight:600;margin:0;}
+  .badge{font-size:11px;color:var(--teal);background:var(--teal-bg);padding:2px 8px;border-radius:99px;font-weight:600;}
+  .panel-sub{color:var(--muted);font-size:13.5px;margin:0 0 18px;}
+
+  .section-label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--hint);font-weight:600;margin:0 0 8px;}
+  ul.items{list-style:none;margin:0 0 20px;padding:0;display:grid;gap:6px;}
+  ul.items li{
+    font-size:13.5px;padding:9px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);
+  }
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{
+    font-size:12.5px;padding:6px 12px;border-radius:99px;
+    background:var(--blue-bg);color:var(--blue);border:none;cursor:pointer;font-weight:500;
+    font-family:inherit;
+  }
+  .chip:hover{filter:brightness(0.96);}
+  .no-relation{font-size:13px;color:var(--muted);font-style:italic;}
+
+  @media (max-width:600px){
+    .panel{padding:18px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Peta sistem informasi kampus</h1>
+    <p class="lede">Klik salah satu sistem untuk melihat detail sub-sistem dan hubungannya dengan kategori lain.</p>
+  </header>
+
+  <div class="diagram-scroll">
+    <div class="diagram" id="diagram">
+      <svg class="rel-lines" id="lines" viewBox="0 0 100 82" preserveAspectRatio="none"></svg>
+      <div class="hub">
+        <div class="t">Sistem informasi kampus</div>
+        <div class="s">10 kategori kebutuhan</div>
+      </div>
+      <!-- nodes injected by JS -->
+    </div>
+  </div>
+  <div class="hint" id="hint">Belum ada sistem yang dipilih</div>
+
+  <div class="panel empty" id="panel">Pilih salah satu sistem di atas untuk melihat detailnya di sini</div>
+</div>
+
+<script>
+const categories = {
+  sdm: {
+    name:"SDM", subtitle:"Pegawai & kinerja dosen",
+    items:["Database Pegawai","Sistem Penilaian dan Pelaporan Kinerja Dosen"],
+    related:["financial","akademik","riset"]
+  },
+  kerjasama: {
+    name:"Kerjasama mitra", subtitle:"Perusahaan, industri, SMA",
+    items:["MOU, MOA, IA","Survey Kepuasan Mitra"],
+    related:["riset","lulusan"]
+  },
+  riset: {
+    name:"Riset & abdimas", subtitle:"Penelitian & publikasi",
+    items:["Sistem Penelitian dan Pengabdian Masyarakat","Database Publikasi"],
+    related:["sdm","financial","kerjasama"]
+  },
+  akademik: {
+    name:"Akademik", subtitle:"8 sistem akademik & MBKM",
+    items:["Sistem Informasi Orang Tua","Sistem Informasi Akademik (SIAKAD)","Rekognisi Pembelajaran Lampau","Outcome Based Education System and Evaluation","Sistem Merdeka Belajar Kampus Merdeka (MBKM)","Ijazah dan Transkrip","Sistem Informasi Akademik khusus Kedokteran (Sistem Blok)","Microcredentials (short course)"],
+    related:["sdm","financial","pmb","kemahasiswaan","lulusan"]
+  },
+  pmb: {
+    name:"Penerimaan mahasiswa", subtitle:"Sistem PMB",
+    items:["Sistem Penerimaan Mahasiswa Baru"],
+    related:["akademik","financial"]
+  },
+  financial: {
+    name:"Financial", subtitle:"5 sistem keuangan & payroll",
+    items:["Revenue Generating Unit","Payroll","Program Pengajuan Anggaran dan LPJ","Keuangan Mahasiswa","Pencatatan Hibah Penelitian dan Abdimas"],
+    related:["sdm","akademik","riset","pmb","aset"]
+  },
+  administrasi: {
+    name:"Administrasi", subtitle:"E-office & arsip digital",
+    items:["E-Office","Arsip Digital"],
+    related:["aset"]
+  },
+  kemahasiswaan: {
+    name:"Kemahasiswaan", subtitle:"Poin, beasiswa & prestasi",
+    items:["Poin Kegiatan Kemahasiswaan","Beasiswa","Catatan Prestasi Mahasiswa"],
+    related:["akademik","lulusan"]
+  },
+  lulusan: {
+    name:"Output lulusan", subtitle:"Tracer study & karir alumni",
+    items:["Tracer Study","Program-program Alumni","Career System"],
+    related:["akademik","kerjasama","kemahasiswaan"]
+  },
+  aset: {
+    name:"Aset universitas", subtitle:"Pengelolaan aset kampus",
+    items:["Pengelolaan Aset Universitas"],
+    related:["financial","administrasi"]
+  }
+};
+
+const order = ["sdm","kerjasama","riset","akademik","pmb","financial","administrasi","kemahasiswaan","lulusan","aset"];
+const cx = 50, cy = 41, R = 33;
+const positions = {};
+
+order.forEach((key,i)=>{
+  const angle = (i/order.length)*2*Math.PI - Math.PI/2;
+  positions[key] = {
+    x: cx + R*Math.cos(angle),
+    y: cy + R*0.92*Math.sin(angle)
+  };
+});
+
+
+const diagram = document.getElementById('diagram');
+const linesSvg = document.getElementById('lines');
+const panel = document.getElementById('panel');
+const hint = document.getElementById('hint');
+let selected = null;
+
+order.forEach(key=>{
+  const cat = categories[key];
+  const pos = positions[key];
+  const el = document.createElement('div');
+  el.className = 'node';
+  el.id = 'node-'+key;
+  el.style.left = pos.x+'%';
+  el.style.top = pos.y+'%';
+  el.innerHTML = '<div class="t">'+cat.name+'</div><div class="s">'+cat.subtitle+'</div>';
+  el.addEventListener('click', ()=> selectCategory(key));
+  diagram.appendChild(el);
+});
+
+document.getElementById('node-financial').style.transform = 'translate(-50%, -50%) translateY(150px)';
+document.getElementById('node-pmb').style.transform = 'translate(-50%, -50%) translateY(150px)';
+document.getElementById('node-akademik').style.transform = 'translate(-50%, -50%) translate(65px,80px)';
+document.getElementById('node-riset').style.transform = 'translate(-50%, -50%) translateY(80px)';
+document.getElementById('node-kemahasiswaan').style.transform = 'translate(-50%, -50%) translate(-70px, 80px)';
+
+// draw all connector lines (hidden by default), one entry per unique pair
+const drawn = new Set();
+order.forEach(key=>{
+  categories[key].related.forEach(r=>{
+    const pairKey = [key,r].sort().join('__');
+    if(drawn.has(pairKey)) return;
+    drawn.add(pairKey);
+    const a = positions[key], b = positions[r];
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', a.x); line.setAttribute('y1', a.y);
+    line.setAttribute('x2', b.x); line.setAttribute('y2', b.y);
+    line.dataset.pair = pairKey;
+    linesSvg.appendChild(line);
+  });
+});
+
+(function shortenLine(pair, amount){
+  const line = linesSvg.querySelector('line[data-pair="'+pair+'"]');
+  if(!line) return;
+  const x1=+line.getAttribute('x1'), y1=+line.getAttribute('y1');
+  const x2=+line.getAttribute('x2'), y2=+line.getAttribute('y2');
+  line.setAttribute('x1', x1 + (x2-x1)*amount);
+  line.setAttribute('y1', y1 + (y2-y1)*amount);
+})('administrasi__aset', 0.20);
+
+function selectCategory(key){
+  selected = key;
+  const cat = categories[key];
+
+  document.querySelectorAll('.node').forEach(n=>{
+    n.classList.remove('selected','related','dimmed');
+  });
+  document.getElementById('node-'+key).classList.add('selected');
+  cat.related.forEach(r=> document.getElementById('node-'+r).classList.add('related'));
+  order.filter(k=> k!==key && !cat.related.includes(k)).forEach(k=>{
+    document.getElementById('node-'+k).classList.add('dimmed');
+  });
+
+  document.querySelectorAll('svg.rel-lines line').forEach(l=>{
+    const isActive = l.dataset.pair.split('__').includes(key);
+    l.classList.toggle('active', isActive);
+  });
+
+  hint.textContent = cat.name+' — '+cat.items.length+' sistem, '+cat.related.length+' relasi';
+
+  const itemsHtml = cat.items.map(i=>'<li>'+i+'</li>').join('');
+  const chipsHtml = cat.related.length
+    ? cat.related.map(r=>'<button class="chip" data-key="'+r+'">'+categories[r].name+'</button>').join('')
+    : '<span class="no-relation">Bersifat lintas kategori, tidak terikat satu relasi spesifik</span>';
+
+  panel.classList.remove('empty');
+  panel.innerHTML =
+    '<div class="panel-header"><h2>'+cat.name+'</h2><span class="badge">'+cat.items.length+' sistem</span></div>'+
+    '<p class="panel-sub">'+cat.subtitle+'</p>'+
+    '<p class="section-label">Sub-sistem</p>'+
+    '<ul class="items">'+itemsHtml+'</ul>'+
+    '<p class="section-label">Terhubung dengan</p>'+
+    '<div class="chips">'+chipsHtml+'</div>';
+
+  panel.querySelectorAll('.chip').forEach(btn=>{
+    btn.addEventListener('click', ()=> selectCategory(btn.dataset.key));
+  });
+
+  panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+</script>
+</body>
+</html>
