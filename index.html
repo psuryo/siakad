@@ -143,19 +143,19 @@ const categories = {
     related:["financial","akademik","riset","spmi","administrasi"]
   },
   kerjasama: {
-    name:"Kerjasama mitra", subtitle:"Perusahaan, industri, SMA",
+    name:"Kerjasama mitra", subtitle:"Univ, industri, NGO & pemerintah",
     items:["MOU, MOA, IA","Survey Kepuasan Mitra"],
-    related:["riset","lulusan"]
+    related:["riset","lulusan","akademik"]
   },
   riset: {
     name:"Riset & abdimas", subtitle:"Penelitian & publikasi",
     items:["Sistem Penelitian dan Pengabdian Masyarakat","Database Publikasi"],
-    related:["sdm","financial","kerjasama","spmi"]
+    related:["sdm","financial","kerjasama","spmi","kemahasiswaan"]
   },
   akademik: {
     name:"Akademik", subtitle:"8 sistem akademik & MBKM",
     items:["Sistem Informasi Orang Tua","Sistem Informasi Akademik (SIAKAD)","Rekognisi Pembelajaran Lampau","Outcome Based Education System and Evaluation","Sistem Merdeka Belajar Kampus Merdeka (MBKM)","Ijazah dan Transkrip","Sistem Informasi Akademik khusus Kedokteran (Sistem Blok)","Microcredentials (short course)"],
-    related:["sdm","financial","pmb","kemahasiswaan","lulusan","spmi","administrasi"]
+    related:["sdm","financial","pmb","kemahasiswaan","lulusan","spmi","administrasi","kerjasama"]
   },
   pmb: {
     name:"Penerimaan mahasiswa", subtitle:"Sistem PMB",
@@ -175,7 +175,7 @@ const categories = {
   kemahasiswaan: {
     name:"Kemahasiswaan", subtitle:"5 sistem kemahasiswaan & ormawa",
     items:["Poin Kegiatan Kemahasiswaan","Beasiswa","Catatan Prestasi Mahasiswa","Kegiatan Kemahasiswaan","Monev Ormawa"],
-    related:["akademik","lulusan","spmi","financial"]
+    related:["akademik","lulusan","spmi","financial","riset"]
   },
   lulusan: {
     name:"Output lulusan", subtitle:"Tracer study & karir alumni",
@@ -189,7 +189,7 @@ const categories = {
   },
   spmi: {
     name:"SPMI", subtitle:"Penjaminan mutu internal",
-    items:["Sistem Penjaminan Mutu Internal (SPMI)"],
+    items:["Sistem Penjaminan Mutu Internal (SPMI)","Survei Kewidyamandalaan, Visi-Misi & Kepuasan Layanan"],
     related:["akademik","sdm","riset","kemahasiswaan"]
   }
 };
@@ -256,7 +256,7 @@ order.forEach(key=>{
   const x2=+line.getAttribute('x2'), y2=+line.getAttribute('y2');
   line.setAttribute('x1', x1 + (x2-x1)*amount);
   line.setAttribute('y1', y1 + (y2-y1)*amount);
-})('administrasi__aset', 0.001);
+})('administrasi__aset', 0.01);
 
 function selectCategory(key){
   selected = key;
