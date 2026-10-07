@@ -533,3 +533,6 @@ Saya malah akan membuat **instrumen studi banding dalam bentuk tabel**, misalnya
 Dengan format seperti ini, hasil studi banding Anda akhirnya bisa langsung berubah menjadi **requirement dan arsitektur Sistem Akademik baru**, bukan hanya menjadi laporan kunjungan.
 
 Kalau Anda mau, saya juga bisa bantu membuat **"Kuesioner Studi Banding Sistem Akademik Universitas" yang sangat lengkap (100+ pertanyaan), dikelompokkan berdasarkan PMB, akademik, kurikulum, KRS, nilai, dosen, mahasiswa, keuangan, integrasi, SSO, data, AI, keamanan, infrastruktur, dan governance**, sekaligus dibuat dalam format yang siap dibawa saat kunjungan.
+Pertanyaan: 
+CPMK tiap mata kuliah ada berapa? ada 3 penilaian formatif dan 1 sumatif
+Apakah setelah disetujui RPS bisa diubah?
