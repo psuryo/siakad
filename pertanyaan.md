@@ -1,9 +1,3 @@
-Kalau tujuan studi bandingnya **bukan sekadar melihat fitur**, tetapi ingin mendapatkan insight untuk **membangun Sistem Akademik Universitas baru**, saya sarankan pertanyaannya jangan dimulai dari *“fiturnya apa saja?”*. Yang jauh lebih berharga adalah menggali:
-
-> **proses bisnis → masalah → keputusan desain → integrasi → tata kelola → pengalaman pengguna → data → teknologi → lessons learned.**
-
-Dengan begitu, Anda bisa mengetahui **mengapa sistem mereka dibuat seperti itu**, bukan hanya meniru tampilannya.
-
 ## 1. Pertanyaan pembuka: visi dan masalah
 
 Mulai dari pertanyaan strategis:
